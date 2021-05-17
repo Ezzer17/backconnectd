@@ -1,0 +1,8 @@
+[Unit]
+Description=Backconnect server with multiple connections support
+
+[Service]
+ExecStart=/usr/bin/backconnectd --config=/etc/backconnectdconfig.yml
+
+[Install]
+WantedBy=multi-user.target

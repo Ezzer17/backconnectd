@@ -1,0 +1,36 @@
+package main
+
+import (
+	"flag"
+	"github.com/ezzer17/backconnectd/config"
+	"github.com/ezzer17/backconnectd/context"
+	"log"
+	"os"
+)
+
+func parseFlags() string {
+	var configPath string
+	flag.StringVar(&configPath, "config", "./config.yml", "path to config file")
+	flag.Parse()
+	return configPath
+}
+
+func main() {
+	var logger *log.Logger
+	cfgPath := parseFlags()
+	cfg, err := config.New(cfgPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	logfile, err := os.OpenFile(cfg.Logfile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		log.Printf("Error opening logfile: %s", err)
+		logger = log.Default()
+	} else {
+		defer logfile.Close()
+		logger = log.New(logfile, "", log.LstdFlags)
+	}
+	ctx := context.New(logger)
+	go ctx.BackconnectLoop(cfg.BackconnectAddr)
+	ctx.AdminLoop(cfg.AdminAddr)
+}
