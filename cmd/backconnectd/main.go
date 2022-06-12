@@ -2,10 +2,11 @@ package main
 
 import (
 	"flag"
-	"github.com/ezzer17/backconnectd/config"
-	"github.com/ezzer17/backconnectd/context"
 	"log"
 	"os"
+
+	"github.com/ezzer17/backconnectd/config"
+	"github.com/ezzer17/backconnectd/context"
 )
 
 func parseFlags() string {

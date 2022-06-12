@@ -1,8 +1,9 @@
 package storage
 
 import (
-	"github.com/google/uuid"
 	"sync"
+
+	"github.com/google/uuid"
 )
 
 type itemWithID interface {
@@ -45,7 +46,7 @@ func (cs *ConcurrentSlice) DeleteByID(id uuid.UUID) bool {
 }
 
 // Get returns item from ConcurrentSlice with given index
-func (cs *ConcurrentSlice) Get(idx int) (interface{}, bool) {
+func (cs *ConcurrentSlice) Get(idx int) (itemWithID, bool) {
 	cs.Lock()
 	defer cs.Unlock()
 	if idx >= len(cs.items) || idx < 0 {

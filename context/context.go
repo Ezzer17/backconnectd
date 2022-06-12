@@ -1,10 +1,11 @@
 package context
 
 import (
-	"github.com/ezzer17/backconnectd/session"
-	"github.com/ezzer17/backconnectd/storage"
 	"log"
 	"net"
+
+	"github.com/ezzer17/backconnectd/session"
+	"github.com/ezzer17/backconnectd/storage"
 )
 
 // ServerContext stores information about open sessions and loggers

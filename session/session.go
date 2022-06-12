@@ -3,13 +3,14 @@ package session
 import (
 	"errors"
 	"fmt"
-	"github.com/ezzer17/backconnectd/storage"
-	"github.com/google/uuid"
 	"io"
 	"net"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/ezzer17/backconnectd/storage"
+	"github.com/google/uuid"
 )
 
 const checkInterval = 500 * time.Millisecond
@@ -29,12 +30,11 @@ type Session interface {
 }
 
 type session struct {
+	SessionInfo
+	conn                net.Conn
 	ctrl                chan sessionCtrlMsg
 	readch              chan []byte
 	updateNotifications chan sessionUpdateNotification
-	conn                net.Conn
-	initTime            time.Time
-	id                  uuid.UUID
 	closeCb             func(Session)
 }
 
@@ -95,7 +95,17 @@ func new(conn net.Conn, closeCb func(Session)) session {
 	readch := make(chan []byte, channelSize)
 	updatech := make(chan sessionUpdateNotification, 1)
 	id := uuid.New()
-	return session{ctrl, readch, updatech, conn, time.Now(), id, closeCb}
+	return session{
+		SessionInfo: SessionInfo{
+			SInitTime:   time.Now(),
+			SID:         id,
+			SRemoteAddr: conn.RemoteAddr(),
+		},
+		ctrl:                ctrl,
+		readch:              readch,
+		updateNotifications: updatech,
+		conn:                conn,
+		closeCb:             closeCb}
 }
 
 func NewAdmin(conn net.Conn, closeCb func(Session)) AdminSession {
@@ -114,22 +124,6 @@ func (session *session) NotifyOfSessionListUpdate() {
 	case session.updateNotifications <- sessionListUpdated:
 	default:
 	}
-}
-
-func (session *session) RemoteAddr() net.Addr {
-	return session.conn.RemoteAddr()
-}
-
-func (session *session) ID() uuid.UUID {
-	return session.id
-}
-
-func (adminSession *AdminSession) String() string {
-	return fmt.Sprintf("Admin session from %s, running for %s", adminSession.conn.RemoteAddr(), time.Since(adminSession.initTime))
-}
-
-func (session *BackconnectSession) String() string {
-	return fmt.Sprintf("Backconnect session from %s, running for %s", session.conn.RemoteAddr(), time.Since(session.initTime))
 }
 
 func (adminSession *AdminSession) ConnectTo(backconnectSession *BackconnectSession) error {
@@ -200,6 +194,14 @@ func (adminSession *AdminSession) GetObjectFromUser(adminSessions *storage.Concu
 func (adminSession *AdminSession) error(msg interface{}) error {
 	_, err := adminSession.conn.Write(BPrintf("Error: %s\n", msg))
 	return err
+}
+
+func (adminSession *AdminSession) String() string {
+	return fmt.Sprintf("Admin session from %s, running for %s", adminSession.conn.RemoteAddr(), time.Since(adminSession.InitTime()))
+}
+
+func (session *BackconnectSession) String() string {
+	return fmt.Sprintf("Backconnect session from %s, running for %s", session.conn.RemoteAddr(), time.Since(session.InitTime()))
 }
 
 func (adminSession *AdminSession) noSessionsAvailable() error {

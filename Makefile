@@ -1,5 +1,6 @@
+.PHONY: backconnectd
 backconnectd:
-	go build -o backconnectd ./cmd/
+	go build -o ./ ./...
 
 .PHONY: test
 test:
