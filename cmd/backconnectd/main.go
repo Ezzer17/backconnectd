@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/ezzer17/backconnectd/config"
-	"github.com/ezzer17/backconnectd/context"
+	"github.com/ezzer17/backconnectd/internal/config"
+	"github.com/ezzer17/backconnectd/internal/context"
 )
 
 func parseFlags() string {
