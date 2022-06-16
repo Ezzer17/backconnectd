@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/ezzer17/backconnectd/config"
-	"github.com/ezzer17/backconnectd/context"
+	"github.com/ezzer17/backconnectd/internal/config"
+	"github.com/ezzer17/backconnectd/internal/server"
 )
 
 func parseFlags() string {
@@ -31,7 +31,7 @@ func main() {
 		defer logfile.Close()
 		logger = log.New(logfile, "", log.LstdFlags)
 	}
-	ctx := context.New(logger)
-	go ctx.BackconnectLoop(cfg.BackconnectAddr)
-	ctx.AdminLoop(cfg.AdminAddr)
+	srv := server.New(logger)
+	go srv.BackconnectLoop(cfg.BackconnectAddr)
+	srv.AdminLoop(cfg.AdminAddr)
 }

@@ -1,3 +1,4 @@
 /backconnectd
+/bcli
 .testCoverage.txt
 *.log

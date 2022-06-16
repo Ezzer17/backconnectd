@@ -56,6 +56,18 @@ func (cs *ConcurrentSlice) Get(idx int) (itemWithID, bool) {
 	return cs.items[idx], true
 }
 
+// GetByID returns item from ConcurrentSlice with given id
+func (cs *ConcurrentSlice) GetByID(id uuid.UUID) (itemWithID, bool) {
+	cs.Lock()
+	defer cs.Unlock()
+	for _, value := range cs.items {
+		if value.ID() == id {
+			return value, true
+		}
+	}
+	return nil, false
+}
+
 // Len returns length of ConcurrentSlice
 func (cs *ConcurrentSlice) Len() int {
 	cs.Lock()

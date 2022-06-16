@@ -1,0 +1,50 @@
+syntax = "proto3";
+package grpc;
+
+option go_package = "github.com/ezzer17/backconnectd";
+
+import "google/protobuf/timestamp.proto";
+
+message SessionInfo {
+	 string id = 1;
+	google.protobuf.Timestamp init_time = 2;
+	string remote_address = 3;
+}
+
+message SessionKillRequest {
+	 string id = 1;
+}
+
+message SessionConnectRequest {
+	 string id = 1;
+	 string ctrlid = 2;
+}
+
+enum EventType {
+    ADD = 0;
+    DELETE = 1;
+ }
+
+message SessionEvent {
+	 EventType type = 1;
+	 SessionInfo session = 2;
+}
+
+message RawData {
+	oneof message {
+		bytes data = 1;
+		string id = 2;
+	}
+}
+
+message SubscribeRequest{}
+
+message Response {
+	bool ok = 1;
+}
+
+service Backconnectd {
+   rpc KillSession(SessionKillRequest) returns (Response);
+   rpc ConnectSession(stream RawData) returns (stream RawData);
+   rpc Subscribe(SubscribeRequest) returns (stream SessionEvent);
+}
