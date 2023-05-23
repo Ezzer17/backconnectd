@@ -118,7 +118,7 @@ func (m *Menu) emitStr(x, y int, style tcell.Style, str string) {
 	}
 }
 
-//Render renders the menu
+// Render renders the menu
 func (m *Menu) Render() {
 	var selectedStyle tcell.Style
 	accentStyle := tcell.StyleDefault.Foreground(tcell.ColorBlack.TrueColor()).Background(tcell.ColorWhite)
@@ -141,10 +141,12 @@ func (m *Menu) Render() {
 	for _, error := range m.drainErrors() {
 		m.errors.Push(error)
 	}
-	for n, error := range m.errors.Content() {
-		m.emitStr(0, h-n-1, tcell.StyleDefault, error.Error())
+	if len(m.errors.Content()) > 0 {
+		m.emitStr(0, h-len(m.errors.Content())-1, tcell.StyleDefault, "Errors:")
+		for n, error := range m.errors.Content() {
+			m.emitStr(0, h-n-1, tcell.StyleDefault, error.Error())
+		}
 	}
-	m.emitStr(0, h-len(m.errors.Content())-1, accentStyle, "Errors:")
 	m.screen.Sync()
 }
 
